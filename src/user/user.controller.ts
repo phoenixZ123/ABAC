@@ -1,20 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UnprocessableEntityException, HttpException, InternalServerErrorException, Logger, ConflictException } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, UserLoginDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
+import { UserRegisterSchema } from './schemas/user.schema';
+import { AppDataSource } from 'src/config/db.config';
+import { User } from './entities/user.entity';
+import bcrypt from "bcrypt";
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  private readonly logger = new Logger(UserService.name);
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  constructor(private readonly userService: UserService) { }
+
+  @Post('register')
+  async create(@Body() createUser: UserRegisterSchema) {
+    return this.userService.create(createUser);
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
+  @Post('login')
+  async login(@Body() userDto: UserLoginDto) {
+    return this.userService.login(userDto);  
   }
 
   @Get(':id')
