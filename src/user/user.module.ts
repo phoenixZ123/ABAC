@@ -4,17 +4,29 @@ import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from 'src/common/strategy/jwt.strategy';
+import { UserGuard } from 'src/common/guards/user.guard';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]) , // 👈 REGISTER REPOSITORY HERE
-     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'supersecret',
-      signOptions: { expiresIn: '1d' },
+    ConfigModule,
+    TypeOrmModule.forFeature([User]),
+    PassportModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_USER_SECRET'),
+        signOptions: { expiresIn: '2h' },
+      }),
+
     }),
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, JwtStrategy, UserGuard],
+  exports: [UserService]
 
 })
-export class UserModule {}
+export class UserModule { }

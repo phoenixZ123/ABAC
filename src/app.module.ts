@@ -5,6 +5,8 @@ import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { getTypeOrmConfig } from './config/typeOrm.config';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiKeyGuard } from './common/guards/api-key.guard';
 
 @Module({
   imports: [
@@ -15,14 +17,14 @@ import { getTypeOrmConfig } from './config/typeOrm.config';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => {
-        console.log('DB_HOST:', configService.get<string>('DB_HOST')); // log works here
-        return getTypeOrmConfig(configService);
-      },
+      useFactory: async (configService: ConfigService) =>
+        getTypeOrmConfig(configService),
     }),
     UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
+
+

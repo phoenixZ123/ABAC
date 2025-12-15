@@ -8,6 +8,7 @@ import bcrypt from "bcrypt";
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from "@nestjs/jwt";
+import { UserRole } from 'src/type/type';
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
@@ -69,8 +70,8 @@ export class UserService {
       if (!isMatch) {
         throw new UnprocessableEntityException('Invalid email or password');
       }
-      const payload={id:user.id,name:user.name,email:user.email,password:user.password};
-      const token=await this.jwtService.signAsync(payload);
+      const payload = { id: user.id, role: user.role, position: user.position };
+      const token = await this.jwtService.signAsync(payload);
       return {
         success: true,
         message: "User Login Successfully",
@@ -88,9 +89,32 @@ export class UserService {
 
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findAll(authUser) {
+    try {
+      if (!authUser) throw new BadRequestException('User info missing');
+
+      const [user,total] = await this.userRepo.findAndCount(); // returns all users
+      console.log(user);
+      return {
+        success: true,
+        message: "Get User List Successfully",
+        user,total
+      }
+    } catch (error: any) {
+      this.logger.error('Error Get All Users', error);
+
+      if (error instanceof HttpException) {
+        throw error; // Keep original status code and message
+      }
+
+      throw new InternalServerErrorException({
+        success: false,
+        message: 'Error Get All Users: ' + error.message,
+      });
+    }
   }
+
+
 
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;

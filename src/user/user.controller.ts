@@ -1,16 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UnprocessableEntityException, HttpException, InternalServerErrorException, Logger, ConflictException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UnprocessableEntityException, HttpException, InternalServerErrorException, Logger, ConflictException, UseGuards, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, UserLoginDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRegisterSchema } from './schemas/user.schema';
-import { AppDataSource } from 'src/config/db.config';
-import { User } from './entities/user.entity';
-import bcrypt from "bcrypt";
+import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
+import { UserGuard } from 'src/common/guards/user.guard';
+import { ApiKeyGuard } from 'src/common/guards/api-key.guard';
+
 @Controller('user')
 export class UserController {
   private readonly logger = new Logger(UserService.name);
 
   constructor(private readonly userService: UserService) { }
+
+  @Get('lists')
+  @UseGuards(JwtAuthGuard)
+  async findAll(@Req() req) {
+    console.log(req.user);
+    return this.userService.findAll(req.user);
+  }
 
   @Post('register')
   async create(@Body() createUser: UserRegisterSchema) {
@@ -19,12 +27,7 @@ export class UserController {
 
   @Post('login')
   async login(@Body() userDto: UserLoginDto) {
-    return this.userService.login(userDto);  
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    return this.userService.login(userDto);
   }
 
   @Patch(':id')

@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEnum, IsNotEmpty, IsOptional, IsString, IsEmail } from "class-validator";
-import { UserRole } from "../entities/user.entity";
+import { UserRole } from "src/type/type";
 
 export class UserRegisterSchema {
   @ApiProperty()

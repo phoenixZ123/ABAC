@@ -1,10 +1,7 @@
+import { UserRole } from "src/type/type";
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
-export enum UserRole {
-    OPERATION = 'operation',
-    USER = 'user',
-    DRIVER = 'driver'
-}
+
 @Entity('user')
 export class User {
     @PrimaryGeneratedColumn('uuid')
@@ -22,7 +19,7 @@ export class User {
     @Column({
         type: "enum",
         enum: UserRole,
-        enumName: "users_role_enum", // safer name than user_role_enum
+        enumName: "role_enum", 
         default: UserRole.USER,
     })
     role!: UserRole;
