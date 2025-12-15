@@ -21,7 +21,7 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     const token = authHeader.split(' ')[1];
-    const secret = this.configService.get('JWT_SECRET') || 'supersecret';
+    const secret = this.configService.get('JWT_USER_SECRET') || 'supersecret';
 
     try {
       const verified = jwt.verify(token, secret) as { [key: string]: any };
@@ -29,6 +29,7 @@ export class JwtAuthGuard implements CanActivate {
 
       // Attach user payload to request
       request.user = verified;
+      console.log(verified);
       return true;
     } catch (err: any) {
       console.error('Token verification error:', err.message);

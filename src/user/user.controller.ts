@@ -14,7 +14,7 @@ export class UserController {
   constructor(private readonly userService: UserService) { }
 
   @Get('list')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async findAll(@Req() req) {
     console.log("user :",req.user);
     return  this.userService.findAll();
