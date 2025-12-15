@@ -13,11 +13,11 @@ export class UserController {
 
   constructor(private readonly userService: UserService) { }
 
-  @Get('lists')
-  @UseGuards(JwtAuthGuard)
+  @Get('list')
+  // @UseGuards(JwtAuthGuard)
   async findAll(@Req() req) {
-    console.log(req.user);
-    return this.userService.findAll(req.user);
+    console.log("user :",req.user);
+    return  this.userService.findAll();
   }
 
   @Post('register')

@@ -89,17 +89,18 @@ export class UserService {
 
   }
 
-  async findAll(authUser) {
+  async findAll() {
     try {
-      if (!authUser) throw new BadRequestException('User info missing');
+      // if (!authUser) throw new BadRequestException('User info missing');
+      // if (authUser.role == "user") {
+        const [user, total] = await this.userRepo.findAndCount(); // returns all users
+        return {
+          success: true,
+          message: "Get User List Successfully",
+          user, total
+        }
+      // }
 
-      const [user,total] = await this.userRepo.findAndCount(); // returns all users
-      console.log(user);
-      return {
-        success: true,
-        message: "Get User List Successfully",
-        user,total
-      }
     } catch (error: any) {
       this.logger.error('Error Get All Users', error);
 
