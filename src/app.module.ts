@@ -8,6 +8,7 @@ import { getTypeOrmConfig } from './config/typeOrm.config';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiKeyGuard } from './common/guards/api-key.guard';
 import { OperatorModule } from './modules/operator/operator.module';
+import { PolicyModule } from './modules/policy/policy.module';
 
 @Module({
   imports: [

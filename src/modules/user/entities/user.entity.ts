@@ -1,5 +1,6 @@
+import { Operator } from "src/modules/operator/entities/operator.entity";
 import { UserRole } from "src/type/type";
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 
 @Entity('user')
@@ -19,18 +20,18 @@ export class User {
     @Column({
         type: "enum",
         enum: UserRole,
-        enumName: "user_role", 
+        enumName: "user_role",
         default: UserRole.USER,
     })
     role!: UserRole;
-
-    @Column({ type: 'text', nullable: true })
-    position!: string;
 
     @CreateDateColumn({ type: 'timestamptz' })
     created_at!: Date;
 
     @UpdateDateColumn({ type: 'timestamptz' })
     updated_at!: Date;
+
+    @OneToOne(() => Operator, operator => operator.user)
+    operator?: Operator;
 
 }

@@ -8,11 +8,12 @@ import { JwtStrategy } from 'src/common/strategy/jwt.strategy';
 import { UserGuard } from 'src/common/guards/user.guard';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
+import { Operator } from '../operator/entities/operator.entity';
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User,Operator]),
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

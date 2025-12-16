@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from "@nestjs/swagger";
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
-import { UserRole } from "src/type/type";
+import { OperatorPosition, UserRole } from "src/type/type";
 
 export class CreateUserSchema {
     @ApiProperty({ description: 'The name of the user', example: 'John Doe' })
@@ -24,9 +24,14 @@ export class CreateUserSchema {
     @IsEnum(UserRole)
     role?: UserRole;
 
+    @ApiPropertyOptional({ description: 'Position of the user', enum: UserRole, example: "manager" })
+    @IsOptional()
+    @IsEnum(OperatorPosition)
+    position?: OperatorPosition;
+
 }
 
-export class UserLoginSchema{
+export class UserLoginSchema {
     @ApiProperty({ description: 'Email of the user', example: 'john@example.com' })
     @IsNotEmpty()
     @IsEmail()

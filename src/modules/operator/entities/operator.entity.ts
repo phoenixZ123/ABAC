@@ -1,5 +1,6 @@
+import { User } from "src/modules/user/entities/user.entity";
 import { OperatorPosition } from "src/type/type";
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 
 @Entity('operators')
@@ -13,9 +14,6 @@ export class Operator {
     @Column({ type: "varchar" })
     email!: string;
 
-    @Column({ type: "varchar" })
-    password!: string;
-
     @Column({
         type: 'enum',
         enumName: "operator_position",
@@ -23,11 +21,15 @@ export class Operator {
         enum: OperatorPosition,
         nullable: true
     })
-    position: OperatorPosition;
+    position?: OperatorPosition;
 
     @CreateDateColumn({ type: 'timestamptz' })
     created_at!: Date;
 
     @UpdateDateColumn({ type: 'timestamptz' })
     updated_at!: Date;
+
+    @OneToOne(() => User, user => user.operator, { onDelete: 'CASCADE' })
+    @JoinColumn()
+    user: User;
 }

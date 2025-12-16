@@ -5,13 +5,15 @@ import bcrypt from "bcrypt";
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from "@nestjs/jwt";
-import { UserRole } from 'src/type/type';
+import { OperatorPosition, UserRole } from 'src/type/type';
 import { CreateUserSchema, UpdateUserSchema, UserLoginSchema } from './schemas/user.schema';
+import { Operator } from '../operator/entities/operator.entity';
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
   constructor(
     @InjectRepository(User) private userRepo: Repository<User>,
+    @InjectRepository(Operator) private operatorRepo: Repository<Operator>,
     private readonly jwtService: JwtService
 
   ) { }
@@ -39,7 +41,18 @@ export class UserService {
       userDto.password = hashedPassword;
 
       const data = this.userRepo.create(userDto);
+
+
       const user = await this.userRepo.save(data);
+      if (userDto.role === 'operator') {
+        const operator = this.operatorRepo.create({
+          name: user.name,
+          email: user.email,
+          position: userDto.position, // default or from DTO
+          user: user, // link to saved user
+        });
+        await this.operatorRepo.save(operator);
+      }
       return {
         success: true,
         message: "User Register Successfully",
@@ -72,7 +85,16 @@ export class UserService {
       if (!isMatch) {
         throw new UnprocessableEntityException('Invalid email or password');
       }
-      const payload = { id: user.id, role: user.role, position: user.position };
+      const payload = { id: user.id, role: user.role, position: user.operator?.position };
+      if (user.role === 'operator') {
+        const operator = await this.operatorRepo.findOne({
+          where: { user: { id: user.id } },
+          select: ['id', 'position'],
+          relations: ['user'], // <<< IMPORTANT
+        });
+        payload.position = operator?.position;
+      }
+      // console.log("user payload:", payload);
       const token = await this.jwtService.signAsync(payload);
       return {
         success: true,
@@ -99,20 +121,20 @@ export class UserService {
 
       let result;
 
-      switch (authUser.role) {
-        case 'admin':
-          // Admin can see all accounts
-          result = await this.userRepo.findAndCount();
-          break;
-        case 'user':
-          result = await this.userRepo.findAndCount({ where: { role: UserRole.USER } });
-          break;
-        case 'operator':
-          result = await this.userRepo.findAndCount({ where: { role: UserRole.OPERATOR } });
-          break;
-        default:
-          throw new ForbiddenException('Forbidden error');
-      }
+      // switch (authUser.role) {
+      //   case 'admin':
+      //     // Admin can see all accounts
+      //     result = await this.userRepo.findAndCount();
+      //     break;
+      //   case 'user':
+      //     result = await this.userRepo.findAndCount({ where: { role: UserRole.USER } });
+      //     break;
+      //   case 'operator':
+      //     break;
+      //   default:
+      //     throw new ForbiddenException('Forbidden error');
+      // }
+      result = await this.userRepo.findAndCount({ where: { role: UserRole.OPERATOR } });
 
       const [user, total] = result;
       return {
@@ -167,7 +189,7 @@ export class UserService {
           // Fetch and return the updated user
           const updatedUser = await this.userRepo.findOne({
             where: { id },
-            select: ['id', 'name', 'email', 'password', 'role', 'position', 'created_at', 'updated_at'], // exclude sensitive fields
+            select: ['id', 'name', 'email', 'password', 'role', 'created_at', 'updated_at'], // exclude sensitive fields
           });
 
           return {

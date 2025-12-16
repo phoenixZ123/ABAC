@@ -6,10 +6,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import { PolicyModule } from 'src/modules/policy/policy.module';
 
 @Module({
-  imports:[
-ConfigModule,
+  imports: [
+    ConfigModule,
     TypeOrmModule.forFeature([Operator]),
     PassportModule,
     JwtModule.registerAsync({
@@ -21,8 +22,10 @@ ConfigModule,
       }),
 
     }),
+    PolicyModule
+
   ],
   controllers: [OperatorController],
   providers: [OperatorService],
 })
-export class OperatorModule {}
+export class OperatorModule { }
