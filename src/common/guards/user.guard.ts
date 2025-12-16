@@ -12,7 +12,7 @@ export class UserGuard implements CanActivate {
 
     if (!user) return false;
 
-    return ['admin', 'operation', 'user', 'driver'].includes(user.role);
+    return ['admin', 'operator', 'user'].includes(user.role);
   }
 }
 

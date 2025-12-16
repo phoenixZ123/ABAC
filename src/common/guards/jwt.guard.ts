@@ -29,7 +29,6 @@ export class JwtAuthGuard implements CanActivate {
 
       // Attach user payload to request
       request.user = verified;
-      console.log(verified);
       return true;
     } catch (err: any) {
       console.error('Token verification error:', err.message);

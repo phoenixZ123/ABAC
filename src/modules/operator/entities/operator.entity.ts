@@ -1,13 +1,13 @@
-import { UserRole } from "src/type/type";
+import { OperatorPosition } from "src/type/type";
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 
-@Entity('user')
-export class User {
+@Entity('operators')
+export class Operator {
     @PrimaryGeneratedColumn('uuid')
-    id!: string;
+    id: string;
 
-    @Column()
+    @Column({ type: "varchar", nullable: true })
     name!: string;
 
     @Column({ type: "varchar" })
@@ -17,20 +17,17 @@ export class User {
     password!: string;
 
     @Column({
-        type: "enum",
-        enum: UserRole,
-        enumName: "role_enum", 
-        default: UserRole.USER,
+        type: 'enum',
+        enumName: "operator_position",
+        default: OperatorPosition.VIEWER,
+        enum: OperatorPosition,
+        nullable: true
     })
-    role!: UserRole;
-
-    @Column({ type: 'text', nullable: true })
-    position!: string;
+    position: OperatorPosition;
 
     @CreateDateColumn({ type: 'timestamptz' })
     created_at!: Date;
 
     @UpdateDateColumn({ type: 'timestamptz' })
     updated_at!: Date;
-
 }

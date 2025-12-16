@@ -43,7 +43,7 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  await app.listen(3002);
+  await app.listen(3000);
   console.log(`server running on ${process.env.PORT}`);
 }
 bootstrap();
